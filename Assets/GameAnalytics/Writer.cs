@@ -14,13 +14,17 @@ public class Writer : MonoBehaviour
         }
     }
 
-    public void Write(string filename, uint n_columns, string[] data) {
-        _Instance._Write(filename, n_columns, data);
+    //filename without extension or path
+    public void Write(string filename, string[,] data) 
+    { 
+        _Instance._Write(filename, data);
     }
 
-    private void _Write(string filename, uint n_columns, string[] data) {
+    private void _Write(string filename, string[,] data) 
+    {
         string path = Application.dataPath + "/CSV/" + filename + ".csv";
 
+        int n_columns = data.GetLength(0);
         int position = 0;
         string serialized = "";
         foreach (string value in data)
