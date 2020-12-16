@@ -46,7 +46,7 @@ public class Reader : MonoBehaviour
             for (int i = 0; i < n_rows; ++i) 
             {
                 string[] cols = rows[i].Split(',');
-                for (int j = 0; j < n_cols; ++i)
+                for (int j = 0; j < n_cols; ++j)
                     ret[i,j] = cols[j];
             }
 
