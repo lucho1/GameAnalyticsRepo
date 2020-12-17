@@ -41,12 +41,13 @@ public class HeatMap : MonoBehaviour
         ret.x = Mathf.FloorToInt(relative_position.x / GridSquareSize);
         ret.y = Mathf.FloorToInt(relative_position.z / GridSquareSize);
 
+        //Should probably check if in bounds, idk
+
         return ret;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
     }
 }
