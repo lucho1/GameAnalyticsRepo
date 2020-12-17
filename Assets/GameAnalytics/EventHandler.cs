@@ -7,13 +7,11 @@ public class EventHandler : MonoBehaviour
 {
     List<DamageEvent> damage_events;
     List<InteractionEvent> interaction_events;
-    Writer writer;
-    Reader reader;
 
-    public string damage_events_filename = "DamageEvents";
-    public string interaction_events_filename = "InteractionEvents";
-    public bool record_session = false;
-    public bool recover_session = true;
+    public string damageEventsFilename = "DamageEvents";
+    public string interactionEventsFilename = "InteractionEvents";
+    public bool recordSession = false;
+    public bool recoverSession = true;
 
 
     // Credit to John Skeet for this utility function
@@ -40,12 +38,10 @@ public class EventHandler : MonoBehaviour
 
     void Start()
     {
-        writer              = new Writer();
-        reader              = new Reader();
         damage_events       = new List<DamageEvent>();
         interaction_events  = new List<InteractionEvent>();
 
-        if (recover_session)
+        if (recoverSession)
         {
             ReadDamageEvents();
             ReadInteractionEvents();
@@ -54,7 +50,7 @@ public class EventHandler : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        if (record_session)
+        if (recordSession)
         {
             WriteDamageEvents();
             WriteInteractionEvents();
@@ -75,17 +71,22 @@ public class EventHandler : MonoBehaviour
             data.Add(row.GetSerialized());
 
         string[,] serialized_data = CreateRectangularArray<string>(data);
-        writer.Write(damage_events_filename, serialized_data);
+        Writer.Write(damageEventsFilename, serialized_data);
 
     }
 
     void ReadDamageEvents()
     {
-        string[][] data = reader.Read(damage_events_filename);
-        foreach (string[] row in data)
+        string[][] data = Reader.Read(damageEventsFilename);
+
+        if (data == null)
+            return;
+
+        uint nrows = (uint) data.GetLength(0);
+        for (int row = 1; row < nrows; ++row) 
         {
             DamageEvent n_event = new DamageEvent();
-            n_event.FromSerialized(row);
+            n_event.FromSerialized(data[row]);
             damage_events.Add(n_event);
         }
     }
@@ -100,20 +101,25 @@ public class EventHandler : MonoBehaviour
         // First we add the header
         data.Add(interaction_events[0].GetSerializedHeader());
 
-        foreach (DamageEvent row in damage_events)
+        foreach (InteractionEvent row in interaction_events)
             data.Add(row.GetSerialized());
 
         string[,] serialized_data = CreateRectangularArray<string>(data);
-        writer.Write(interaction_events_filename, serialized_data);
+        Writer.Write(interactionEventsFilename, serialized_data);
     }
 
     void ReadInteractionEvents()
     {
-        string[][] data = reader.Read(interaction_events_filename);
-        foreach (string[] row in data)
+        string[][] data = Reader.Read(interactionEventsFilename);
+
+        if (data == null)
+            return;
+
+        uint nrows = (uint) data.GetLength(0);
+        for (int row = 1; row < nrows; ++row) 
         {
             InteractionEvent n_event = new InteractionEvent();
-            n_event.FromSerialized(row);
+            n_event.FromSerialized(data[row]);
             interaction_events.Add(n_event);
         }
     }

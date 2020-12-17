@@ -1,30 +1,14 @@
 ﻿using System.IO;
 using UnityEngine;
 
-public class Writer : MonoBehaviour
+public static class Writer
 {
-    private static Writer _Instance;
-    public static Writer Instance
-    {
-        get
-        {
-            if (_Instance == null)
-                _Instance = new Writer();
-            return _Instance;
-        }
-    }
-
-    //filename without extension or path
-    public void Write(string filename, string[,] data) 
-    { 
-        _Instance._Write(filename, data);
-    }
-
-    private void _Write(string filename, string[,] data) 
+    public static void Write(string filename, string[,] data) 
     {
         string path = Application.dataPath + "/CSV/" + filename + ".csv";
 
-        int n_columns = data.GetLength(0);
+        int n_columns = data.GetLength(1);
+        int n_rows = data.GetLength(0);
         int position = 0;
         string serialized = "";
         foreach (string value in data)
@@ -32,14 +16,19 @@ public class Writer : MonoBehaviour
             position++;
             serialized += value;
             if (position % n_columns == 0)
-                serialized += '\n';
+            {
+                if (position != n_columns * n_rows)
+                    serialized += '\n';
+            }
             else
                 serialized += ',';
         }
 
-         StreamWriter writer = new StreamWriter (path);
-         writer.WriteLine(serialized);
-         writer.Close();
+        FileStream file = File.Open(path, FileMode.Create); // will create the file or overwrite it if it already exists
+        StreamWriter writer = new StreamWriter (file);
+        writer.Write(serialized);
+        writer.Close();
+        file.Close();
     }
 
 }
