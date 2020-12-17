@@ -354,7 +354,7 @@ public class PositionEvent : EventData
         n_columns = 5;
     }
 
-    public PositionEvent(uint event_id, DateTime timestamp, Vector3 position, string what) : base(event_id, timestamp)
+    public PositionEvent(uint event_id, DateTime timestamp, Vector3 position) : base(event_id, timestamp)
     {
         _position = position;
         n_columns = 5;

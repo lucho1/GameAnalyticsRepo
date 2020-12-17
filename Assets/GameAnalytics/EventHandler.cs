@@ -7,11 +7,17 @@ public class EventHandler : MonoBehaviour
 {
     List<DamageEvent> damage_events;
     List<InteractionEvent> interaction_events;
+    List<PositionEvent> position_events;
+
+    float last_position_event;
 
     public string damageEventsFilename = "DamageEvents";
     public string interactionEventsFilename = "InteractionEvents";
+    public string positionEventsFilename = "PositionEvents";
     public bool recordSession = false;
     public bool recoverSession = true;
+    public int secondsForPositionEvent = 5;
+    public GameObject player;
 
 
     // Credit to John Skeet for this utility function
@@ -40,11 +46,23 @@ public class EventHandler : MonoBehaviour
     {
         damage_events       = new List<DamageEvent>();
         interaction_events  = new List<InteractionEvent>();
+        position_events     = new List<PositionEvent>();
+        last_position_event = Time.time;
 
         if (recoverSession)
         {
             ReadDamageEvents();
             ReadInteractionEvents();
+            ReadPositionEvents();
+        }
+    }
+
+    void Update()
+    {
+        if (Time.time - last_position_event > secondsForPositionEvent)
+        {
+            last_position_event = Time.time;
+            CreatePositionEvent(player);
         }
     }
 
@@ -54,6 +72,7 @@ public class EventHandler : MonoBehaviour
         {
             WriteDamageEvents();
             WriteInteractionEvents();
+            WritePositionEvents();
         }
     }
 
@@ -124,6 +143,39 @@ public class EventHandler : MonoBehaviour
         }
     }
 
+    void WritePositionEvents()
+    {
+        if (position_events.Count <= 0)
+            return;
+        
+        List<string[]> data = new List<string[]>();
+
+        // First we add the header
+        data.Add(position_events[0].GetSerializedHeader());
+
+        foreach (PositionEvent row in position_events)
+            data.Add(row.GetSerialized());
+
+        string[,] serialized_data = CreateRectangularArray<string>(data);
+        Writer.Write(positionEventsFilename, serialized_data);
+    }
+
+    void ReadPositionEvents()
+    {
+        string[][] data = Reader.Read(positionEventsFilename);
+
+        if (data == null)
+            return;
+
+        uint nrows = (uint) data.GetLength(0);
+        for (int row = 1; row < nrows; ++row) 
+        {
+            PositionEvent n_event = new PositionEvent();
+            n_event.FromSerialized(data[row]);
+            position_events.Add(n_event);
+        }
+    }
+
     public void CreateDeathEvent(GameObject player)
     {
         DamageEvent new_event = new DamageEvent((uint)damage_events.Count, System.DateTime.Now, player.transform.position, "Death");
@@ -146,6 +198,12 @@ public class EventHandler : MonoBehaviour
     {
         InteractionEvent new_event = new InteractionEvent((uint)interaction_events.Count, System.DateTime.Now, what.transform.position, what.name);
         interaction_events.Add(new_event);
+    }
+
+    public void CreatePositionEvent(GameObject player)
+    {
+        PositionEvent new_event = new PositionEvent((uint)position_events.Count, System.DateTime.Now, player.transform.position);
+        position_events.Add(new_event);
     }
 
 
