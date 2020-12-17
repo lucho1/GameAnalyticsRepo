@@ -8,6 +8,12 @@ public class EventData : MonoBehaviour
     protected DateTime _timestamp;
     protected uint n_columns = 2;
 
+    public EventData()
+    {
+        _event_id = 0;
+        _timestamp = System.DateTime.Now;
+    }
+
     public EventData(uint event_id, DateTime timestamp) 
     {
         _event_id = event_id;
@@ -98,6 +104,14 @@ public class DamageEvent : EventData
     Vector3 _position;
     string _type;
     string _what;
+
+    public DamageEvent() : base()
+    {
+        _type = "";
+        _what = "";
+        _position = Vector3.up;
+        n_columns = 7;
+    }
 
     public DamageEvent(uint event_id, DateTime timestamp, Vector3 position, string type, string what = "") : base(event_id, timestamp)
     {
@@ -211,6 +225,13 @@ public class InteractionEvent : EventData
 {
     Vector3 _position;
     string _what;
+
+    public InteractionEvent() : base()
+    {
+        _what = "";
+        _position = Vector3.up;
+        n_columns = 6;
+    }
 
     public InteractionEvent(uint event_id, DateTime timestamp, Vector3 position, string what) : base(event_id, timestamp)
     {

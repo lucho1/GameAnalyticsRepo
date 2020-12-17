@@ -16,12 +16,12 @@ public class Reader : MonoBehaviour
     }
 
     
-    public string[,] Read(string filename) 
+    public string[][] Read(string filename) 
     {
         return _Instance._Read(filename);
     }
 
-    private string[,] _Read (string filename)
+    private string[][] _Read (string filename)
     {
         string path = Application.dataPath + "/CSV/" + filename + ".csv";
         if (File.Exists(path)) 
@@ -39,18 +39,14 @@ public class Reader : MonoBehaviour
             }
 
             string[] rows = data.Split('\n');
-            int n_rows = rows.Length;
-            int n_cols = rows[0].Split(',').Length;
 
-            string[,] ret = new string[n_cols, n_rows];
-            for (int i = 0; i < n_rows; ++i) 
+            List<string[]> ret = new List<string[]>();
+            foreach (string row in rows) 
             {
-                string[] cols = rows[i].Split(',');
-                for (int j = 0; j < n_cols; ++j)
-                    ret[i,j] = cols[j];
+                ret.Add(row.Split(','));
             }
 
-            return ret;
+            return ret.ToArray();
         }
         else
         {

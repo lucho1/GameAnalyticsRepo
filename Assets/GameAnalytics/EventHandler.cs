@@ -7,8 +7,14 @@ public class EventHandler : MonoBehaviour
 {
     List<DamageEvent> damage_events;
     List<InteractionEvent> interaction_events;
-    public bool record_session = false;
     Writer writer;
+    Reader reader;
+
+    public string damage_events_filename = "DamageEvents";
+    public string interaction_events_filename = "InteractionEvents";
+    public bool record_session = false;
+    public bool recover_session = true;
+
 
     // Credit to John Skeet for this utility function
     static T[,] CreateRectangularArray<T>(List<T[]> arrays)
@@ -34,7 +40,16 @@ public class EventHandler : MonoBehaviour
 
     void Start()
     {
-        writer = new Writer();
+        writer              = new Writer();
+        reader              = new Reader();
+        damage_events       = new List<DamageEvent>();
+        interaction_events  = new List<InteractionEvent>();
+
+        if (recover_session)
+        {
+            ReadDamageEvents();
+            ReadInteractionEvents();
+        }
     }
 
     void OnApplicationQuit()
@@ -60,8 +75,19 @@ public class EventHandler : MonoBehaviour
             data.Add(row.GetSerialized());
 
         string[,] serialized_data = CreateRectangularArray<string>(data);
-        writer.Write("DamageEvents", serialized_data);
+        writer.Write(damage_events_filename, serialized_data);
 
+    }
+
+    void ReadDamageEvents()
+    {
+        string[][] data = reader.Read(damage_events_filename);
+        foreach (string[] row in data)
+        {
+            DamageEvent n_event = new DamageEvent();
+            n_event.FromSerialized(row);
+            damage_events.Add(n_event);
+        }
     }
 
     void WriteInteractionEvents()
@@ -78,7 +104,18 @@ public class EventHandler : MonoBehaviour
             data.Add(row.GetSerialized());
 
         string[,] serialized_data = CreateRectangularArray<string>(data);
-        writer.Write("InteractionEvents", serialized_data);
+        writer.Write(interaction_events_filename, serialized_data);
+    }
+
+    void ReadInteractionEvents()
+    {
+        string[][] data = reader.Read(interaction_events_filename);
+        foreach (string[] row in data)
+        {
+            InteractionEvent n_event = new InteractionEvent();
+            n_event.FromSerialized(row);
+            interaction_events.Add(n_event);
+        }
     }
 
     public void CreateDeathEvent(GameObject player)
