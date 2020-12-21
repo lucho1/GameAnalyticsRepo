@@ -4,6 +4,8 @@ public class HeatMapCube : MonoBehaviour
 {
     public void SetColor(Color c)
     {
-        GetComponent<Renderer>().material.color = c;
+        Material mat = GetComponent<Renderer>().material;
+        c.a = mat.color.a;
+        mat.color = c;
     }
 }

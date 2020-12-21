@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 public class EventHandler : MonoBehaviour
 {
-    List<DamageEvent> damage_events;
-    List<InteractionEvent> interaction_events;
-    List<PositionEvent> position_events;
+    [System.NonSerialized]
+    public List<DamageEvent> damage_events;
+    [System.NonSerialized]
+    public List<InteractionEvent> interaction_events;
+    [System.NonSerialized]
+    public List<PositionEvent> position_events;
 
     float last_position_event;
 
@@ -18,6 +22,9 @@ public class EventHandler : MonoBehaviour
     public bool recoverSession = true;
     public int secondsForPositionEvent = 5;
     public GameObject player;
+
+    public UnityEvent GADeathEvent, GADamageEvent, GAKillEvent, GAPositionEvent, GAInteractionEvent;
+
 
 
     // Credit to John Skeet for this utility function
@@ -178,30 +185,35 @@ public class EventHandler : MonoBehaviour
 
     public void CreateDeathEvent(GameObject player)
     {
+        GADeathEvent.Invoke();
         DamageEvent new_event = new DamageEvent((uint)damage_events.Count, System.DateTime.Now, player.transform.position, "Death");
         damage_events.Add(new_event);
     }
 
     public void CreateDamageEvent(GameObject player)
     {
+        GADamageEvent.Invoke();
         DamageEvent new_event = new DamageEvent((uint)damage_events.Count, System.DateTime.Now, player.transform.position, "Damage");
         damage_events.Add(new_event);
     }
 
     public void CreateKillEvent(GameObject what)
     {
+        GAKillEvent.Invoke();
         DamageEvent new_event = new DamageEvent((uint)damage_events.Count, System.DateTime.Now, what.transform.position, "Kill", what.name);
         damage_events.Add(new_event);
     }
 
     public void CreateInteractionEvent(GameObject what)
     {
+        GAInteractionEvent.Invoke();
         InteractionEvent new_event = new InteractionEvent((uint)interaction_events.Count, System.DateTime.Now, what.transform.position, what.name);
         interaction_events.Add(new_event);
     }
 
     public void CreatePositionEvent(GameObject player)
     {
+        GAPositionEvent.Invoke();
         PositionEvent new_event = new PositionEvent((uint)position_events.Count, System.DateTime.Now, player.transform.position);
         position_events.Add(new_event);
     }

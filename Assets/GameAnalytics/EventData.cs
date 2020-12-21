@@ -130,6 +130,11 @@ public class DamageEvent : EventData
         n_columns = 7;
     }
 
+    public Vector3 GetPosition()
+    {
+        return _position;
+    }
+
     new public string[] GetSerialized() 
     {
         string[] ret = new string[n_columns];
@@ -249,6 +254,11 @@ public class InteractionEvent : EventData
         n_columns = 6;
     }
 
+    public Vector3 GetPosition()
+    {
+        return _position;
+    }
+
         new public string[] GetSerialized() 
     {
         string[] ret = new string[n_columns];
@@ -358,6 +368,11 @@ public class PositionEvent : EventData
     {
         _position = position;
         n_columns = 5;
+    }
+
+    public Vector3 GetPosition()
+    {
+        return _position;
     }
 
         new public string[] GetSerialized() 
